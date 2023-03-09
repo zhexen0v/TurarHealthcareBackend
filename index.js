@@ -46,9 +46,13 @@ app.use(cors());
 app.post('/register', checkAuthAdmin, adminRegisterValidator, AdminController.register);
 app.post('/login', adminLoginValidator, AdminController.login);
 /* General information */
+app.get('/general', GeneralInformationController.showGeneralInformation);
 app.post('/general/update', checkAuthAdmin, updateGeneralInformtaionValidator, GeneralInformationController.updateInfo);
 app.post('/general/initial', checkAuthAdmin, updateGeneralInformtaionValidator, GeneralInformationController.initialInsert);
 /* Blog */
+app.get('/blog', BlogController.showAllArticles);
+app.get('/blog/latest', BlogController.showLastArticles);
+app.get('/blog/:id', BlogController.showArticleById);
 app.post('/blog/add', checkAuthAdmin, upload.single("blog"), BlogController.addNewArticleIntoBlog);
 app.post('/blog/update', checkAuthAdmin, blogUpdateValidator, BlogController.updateArticleIntoBlog);
 

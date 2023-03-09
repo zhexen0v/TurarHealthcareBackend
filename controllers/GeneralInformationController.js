@@ -36,6 +36,8 @@ export const updateInfo = async (req, res) => {
                     firstTitle: req.body.firstTitle.trim(),
                     secondTitle: req.body.secondTitle,
                     additionalTitle: req.body.additionalTitle,
+                    instagramLink: req.body.instagram,
+                    facebookLink: req.body.facebook,
                     bgImage: req.body.image    
                }); 
           if (!updatedGeneralInformation) {
@@ -49,5 +51,17 @@ export const updateInfo = async (req, res) => {
           res.status(500).json({
                message: error.message
           });
+     }
+}
+
+export const showGeneralInformation = async (req, res) => {
+     try {
+          const generalInfo = await Generalnformation.findOne();
+          res.json(generalInfo);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          })
      }
 }

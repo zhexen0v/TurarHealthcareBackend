@@ -47,3 +47,54 @@ export const updateArticleIntoBlog = async (req, res) => {
           });
      }
 }
+
+export const showAllArticles = async (req, res) => {
+     try {
+          const allArticles = await Blog.find({});
+          if (allArticles.length === 0) {
+               res.status(400).json({
+                    message: 'Articles not found'
+               });
+          }
+          res.json(allArticles);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          });
+     }
+}
+
+export const showLastArticles = async (req, res) => {
+     try {
+          const allArticles = await Blog.find({}).limit(3);
+          if (allArticles.length === 0) {
+               res.status(400).json({
+                    message: 'Articles not found'
+               });
+          }
+          res.json(allArticles);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          });
+     }
+}
+
+export const showArticleById = async (req, res) => {
+     try {
+          const article = await Blog.findById(req.params.id);
+          if (!article) {
+               res.status(400).json({
+                    message: 'Article not found'
+               });
+          }
+          res.json(article);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          });
+     }
+}

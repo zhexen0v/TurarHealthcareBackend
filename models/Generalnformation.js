@@ -36,6 +36,14 @@ const GeneralnformationSchema = new mongoose.Schema({
           type: multilingualContent,
           required: true,
      },
+     instagramLink: {
+          type: String,
+          required: true,
+     },
+     facebookLink: {
+          type: String, 
+          required: true
+     },
      bgImage: {
           type: String,
           required: false,
