@@ -48,6 +48,10 @@ const GeneralnformationSchema = new mongoose.Schema({
           type: String,
           required: false,
      },
+     homeBgImage: {
+          type: String,
+          required: false
+     }
 });
 
 export default mongoose.model('GeneralInformation', GeneralnformationSchema, "general_information");

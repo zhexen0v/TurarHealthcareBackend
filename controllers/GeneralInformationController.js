@@ -65,3 +65,37 @@ export const showGeneralInformation = async (req, res) => {
           })
      }
 }
+
+export const changeBackgroundImage = async (req, res) => {
+     try {
+          const updatedBackground = await Generalnformation.updateOne({}, {bgImage: req.file.filename});
+          if (!updatedBackground) {
+               res.status(400).json({
+                    message: 'Background not found'
+               });  
+          }
+          res.json(updatedBackground);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          })
+     }
+}
+
+export const changeHomeBackgroundImage = async (req, res) => {
+     try {
+          const updatedHomeBackground = await Generalnformation.updateOne({}, {homeBgImage: req.file.filename});
+          if (!updatedHomeBackground) {
+               res.status(400).json({
+                    message: 'Background not found'
+               });  
+          }
+          res.json(updatedHomeBackground);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          })
+     }
+}
