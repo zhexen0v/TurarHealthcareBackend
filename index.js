@@ -1,11 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import { AdminController, GeneralInformationController, BlogController, PartnerController } from './controllers/AllControllers.js';
+import { AdminController, GeneralInformationController, BlogController, PartnerController, PageController } from './controllers/AllControllers.js';
 import { adminRegisterValidator, adminLoginValidator } from './validators/adminValidator.js';
 import { updateGeneralInformtaionValidator } from './validators/generalInformationValidator.js';
 import { blogUpdateValidator } from './validators/blogValidator.js';
 import { addOrUpdatePartner } from './validators/partnerValidator.js';
+import { addParentPageValidator } from './validators/parentPageValidator.js';
 import checkAuthAdmin from './middlewares/checkAuthAdmin.js';
 import multer from 'multer';
 
@@ -48,6 +49,7 @@ app.use(express.json());
 app.use(cors());
 app.use('/uploads/blog', express.static('uploads/blog'));
 app.use('/uploads/backgrounds', express.static('uploads/backgrounds'));
+app.use('/uploads/partners', express.static('uploads/partners'));
 
 /* Admin registration/login */
 app.post('/register', checkAuthAdmin, adminRegisterValidator, AdminController.register);
@@ -69,6 +71,12 @@ app.post('/blog/update', checkAuthAdmin, blogUpdateValidator, BlogController.upd
 /* Partner */
 app.post('/partner/add', checkAuthAdmin, upload.single('partner'), addOrUpdatePartner, PartnerController.addNewPartner);
 app.get('/partners', PartnerController.getAllPartners);
+
+/* Pages */
+app.get('/page/parent', PageController.showAllParentPage);
+app.post('/page/parent/add', checkAuthAdmin, addParentPageValidator, PageController.addNewParentPage);
+app.post('/page/nested/add', checkAuthAdmin, PageController.addNewNestedPage);
+
 
 const port = process.env.PORT || 4000;
 

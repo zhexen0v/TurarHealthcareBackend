@@ -30,14 +30,13 @@ export const updateInfo = async (req, res) => {
           }
           const updatedGeneralInformation = await Generalnformation.updateOne({}, 
                {
-                    phoneNumber: req.body.phone.trim(),
+                    phoneNumber: req.body.phoneNumber.trim(),
                     address: req.body.address,
                     mail: req.body.mail.trim(),
                     firstTitle: req.body.firstTitle.trim(),
                     secondTitle: req.body.secondTitle,
                     additionalTitle: req.body.additionalTitle,
-                    instagramLink: req.body.instagram,
-                    facebookLink: req.body.facebook,
+                    instagramLink: req.body.instagramLink.trim(),
                     bgImage: req.body.image    
                }); 
           if (!updatedGeneralInformation) {

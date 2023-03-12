@@ -8,6 +8,10 @@ const multilingualContent = new mongoose.Schema({
      ru: {
           type: String,
           required: true,
+     }, 
+     en: {
+          type: String,
+          required: true
      }
 }, {_id: false});
 
