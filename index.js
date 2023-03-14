@@ -66,16 +66,22 @@ app.get('/blog', BlogController.showAllArticles);
 app.get('/blog/latest', BlogController.showLastArticles);
 app.get('/blog/:id', BlogController.showArticleById);
 app.post('/blog/add', checkAuthAdmin, upload.single("blog"), BlogController.addNewArticleIntoBlog);
-app.post('/blog/update', checkAuthAdmin, blogUpdateValidator, BlogController.updateArticleIntoBlog);
+app.post('/blog/update', checkAuthAdmin, upload.single("blog"), BlogController.updateArticleIntoBlog);
 
 /* Partner */
 app.post('/partner/add', checkAuthAdmin, upload.single('partner'), addOrUpdatePartner, PartnerController.addNewPartner);
+app.post('/partner/update', checkAuthAdmin, upload.single('partner'), addOrUpdatePartner, PartnerController.updatePartner);
+app.post('/partner/delete/:id', checkAuthAdmin, PartnerController.deletePartner);
 app.get('/partners', PartnerController.getAllPartners);
 
 /* Pages */
+app.get('/:link', PageController.showPageByLink);
+app.get('/nested/:id', PageController.showNestedPageById);
 app.get('/page/parent', PageController.showAllParentPage);
+app.get('/page', PageController.showAllPages);
 app.post('/page/parent/add', checkAuthAdmin, addParentPageValidator, PageController.addNewParentPage);
 app.post('/page/nested/add', checkAuthAdmin, PageController.addNewNestedPage);
+app.post('/page/nested/update', checkAuthAdmin, PageController.updateNestedPage);
 
 
 const port = process.env.PORT || 4000;

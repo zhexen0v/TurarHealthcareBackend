@@ -20,6 +20,10 @@ const BlogSchema = new mongoose.Schema({
           type: ContentSchema,
           required: true
      },
+     en: {
+          type: ContentSchema,
+          required: true
+     },
      imageUrl: {
           type: String,
           required: true,

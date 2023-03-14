@@ -11,4 +11,9 @@ export const addOrUpdatePartner = [
           .withMessage("Title in Russian is required")
           .isString()
           .withMessage("Title in Russian should be string"),
+     body("en")
+          .exists({ checkFalsy: true })
+          .withMessage("Title in English is required")
+          .isString()
+          .withMessage("Title in English should be string")
 ];

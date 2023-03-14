@@ -10,6 +10,7 @@ export const addNewArticleIntoBlog = async (req, res) => {
           const newDocument = new Blog({
                kz: JSON.parse(req.body.json).kz,
                ru: JSON.parse(req.body.json).ru,
+               en: JSON.parse(req.body.json).en,
                imageUrl: req.file.originalname
           });
 
@@ -27,12 +28,17 @@ export const addNewArticleIntoBlog = async (req, res) => {
 
 export const updateArticleIntoBlog = async (req, res) => {
      try {
+          let updatedObj = {
+               kz: JSON.parse(req.body.json).kz,
+               ru: JSON.parse(req.body.json).ru,
+               en: JSON.parse(req.body.json).en,
+          }
+          if(req.file) {
+               updatedObj.imageUrl = req.file.originalname;
+          }
           const updatedArticle = await Blog.findByIdAndUpdate(
                req.body.id, 
-               {
-                    kz: req.body.kz,
-                    ru: req.body.ru
-               }
+               updatedObj
           );
           if (updatedArticle.matchedCount === 0) {
                return res.status(404).json({
@@ -50,7 +56,7 @@ export const updateArticleIntoBlog = async (req, res) => {
 
 export const showAllArticles = async (req, res) => {
      try {
-          const allArticles = await Blog.find({});
+          const allArticles = await Blog.find().sort({createdAt: -1});
           if (allArticles.length === 0) {
                res.status(400).json({
                     message: 'Articles not found'
@@ -67,7 +73,7 @@ export const showAllArticles = async (req, res) => {
 
 export const showLastArticles = async (req, res) => {
      try {
-          const allArticles = await Blog.find({}).limit(3);
+          const allArticles = await Blog.find().sort({createdAt: -1}).limit(3);
           if (allArticles.length === 0) {
                res.status(400).json({
                     message: 'Articles not found'

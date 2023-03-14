@@ -28,6 +28,7 @@ export const addNewPartner = async (req, res) => {
           const newDocument = new Partner({
                kzTitle: req.body.kz,
                ruTitle: req.body.ru,
+               enTitle: req.body.en,
                imageUrl: req.file.filename
           });
 
@@ -40,3 +41,51 @@ export const addNewPartner = async (req, res) => {
           });
      }
 } 
+
+export const updatePartner = async (req, res) => {
+     try {
+          const errors = validationResult(req);
+          if (!errors.isEmpty()){
+               return res.status(400).json(errors.array());
+          }
+
+          let updatedObj = {
+               kzTitle: req.body.kz,
+               ruTitle: req.body.ru,
+               enTitle: req.body.en,
+          }
+          if (req.file) {
+               updatedObj.imageUrl = req.file.filename;
+          }
+
+          const updatedPartner = await Partner.findByIdAndUpdate(
+               req.body.id,
+               updatedObj
+          );
+
+          if (updatePartner.matchedCount === 0) {
+               res.status(400).json({
+                    message: 'Partner not found'
+               });
+          }
+
+          res.json(updatedPartner);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          });
+     }
+} 
+
+export const deletePartner = async (req, res) => {
+     try {
+          const deletedPartner = await Partner.findByIdAndDelete(req.params.id);
+          res.json(deletedPartner);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          })
+     }
+}
