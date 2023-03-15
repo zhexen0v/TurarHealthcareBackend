@@ -3,7 +3,7 @@ import { validationResult } from "express-validator";
 
 export const getAllPartners = async (req, res) => {
      try {
-          const partners = await Partner.find({});
+          const partners = await Partner.find({}).sort({createdAt: -1});
           if (!partners) {
                res.status(400).json({
                     message: error.message

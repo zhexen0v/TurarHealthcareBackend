@@ -104,3 +104,19 @@ export const showArticleById = async (req, res) => {
           });
      }
 }
+
+export const deleteArticle = async (req, res) => {
+     try {
+          const deletedArticle = await Blog.findByIdAndDelete(req.params.id);
+          if(deletedArticle.deletedCount !== 1) {
+               res.status(400).json({
+                    message: 'Article not deleted'
+               });
+          }
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          });  
+     }
+}

@@ -1,10 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import { AdminController, GeneralInformationController, BlogController, PartnerController, PageController } from './controllers/AllControllers.js';
+import { AdminController, GeneralInformationController, BlogController, PartnerController, PageController, DocumentController } from './controllers/AllControllers.js';
 import { adminRegisterValidator, adminLoginValidator } from './validators/adminValidator.js';
 import { updateGeneralInformtaionValidator } from './validators/generalInformationValidator.js';
-import { blogUpdateValidator } from './validators/blogValidator.js';
+import { documentCategoryAddOrUpdateValidator } from './validators/documentCategoryValidator.js';
 import { addOrUpdatePartner } from './validators/partnerValidator.js';
 import { addParentPageValidator } from './validators/parentPageValidator.js';
 import checkAuthAdmin from './middlewares/checkAuthAdmin.js';
@@ -26,6 +26,8 @@ const sendFileToNecessaryFolder = (url) => {
           return 'uploads/backgrounds';
      } else if (url.startsWith('/partner')) {
           return 'uploads/partners';
+     } else if (url.startWith('/document')) {
+          return 'uploads/documents'
      } else {
           return 'uploads';
      }
@@ -50,6 +52,8 @@ app.use(cors());
 app.use('/uploads/blog', express.static('uploads/blog'));
 app.use('/uploads/backgrounds', express.static('uploads/backgrounds'));
 app.use('/uploads/partners', express.static('uploads/partners'));
+app.use('/uploads/documents', express.static('uploads/documents'));
+
 
 /* Admin registration/login */
 app.post('/register', checkAuthAdmin, adminRegisterValidator, AdminController.register);
@@ -67,6 +71,7 @@ app.get('/blog/latest', BlogController.showLastArticles);
 app.get('/blog/:id', BlogController.showArticleById);
 app.post('/blog/add', checkAuthAdmin, upload.single("blog"), BlogController.addNewArticleIntoBlog);
 app.post('/blog/update', checkAuthAdmin, upload.single("blog"), BlogController.updateArticleIntoBlog);
+app.post('/blog/delete/:id', checkAuthAdmin, BlogController.deleteArticle);
 
 /* Partner */
 app.post('/partner/add', checkAuthAdmin, upload.single('partner'), addOrUpdatePartner, PartnerController.addNewPartner);
@@ -82,6 +87,13 @@ app.get('/page', PageController.showAllPages);
 app.post('/page/parent/add', checkAuthAdmin, addParentPageValidator, PageController.addNewParentPage);
 app.post('/page/nested/add', checkAuthAdmin, PageController.addNewNestedPage);
 app.post('/page/nested/update', checkAuthAdmin, PageController.updateNestedPage);
+
+/* Documents */
+app.post('/document/category/add', checkAuthAdmin, documentCategoryAddOrUpdateValidator, DocumentController.addNewDocumentCategory);
+app.post('/document/category/update/:id', checkAuthAdmin, documentCategoryAddOrUpdateValidator, DocumentController.updateDocumentCategory);
+app.post('/document/category/delete/:id', checkAuthAdmin, DocumentController.deleteDocumentCategory);
+app.get('/document/category', DocumentController.getAllDocumentCategories);
+app.get('/document/category/:link', DocumentController.getDocumentCategoryByLink);
 
 
 const port = process.env.PORT || 4000;
