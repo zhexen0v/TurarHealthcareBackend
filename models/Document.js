@@ -25,10 +25,6 @@ const DocumentSchema = new mongoose.Schema({
           ref: 'DocumentCategory',
           required: true
      },
-     link: {
-          type: String,
-          required: true,
-     },
      filename: {
           type: String,
           required: true

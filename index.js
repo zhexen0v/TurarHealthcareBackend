@@ -26,7 +26,7 @@ const sendFileToNecessaryFolder = (url) => {
           return 'uploads/backgrounds';
      } else if (url.startsWith('/partner')) {
           return 'uploads/partners';
-     } else if (url.startWith('/document')) {
+     } else if (url.startsWith('/document')) {
           return 'uploads/documents'
      } else {
           return 'uploads';
@@ -94,6 +94,9 @@ app.post('/document/category/update/:id', checkAuthAdmin, documentCategoryAddOrU
 app.post('/document/category/delete/:id', checkAuthAdmin, DocumentController.deleteDocumentCategory);
 app.get('/document/category', DocumentController.getAllDocumentCategories);
 app.get('/document/category/:link', DocumentController.getDocumentCategoryByLink);
+app.post('/document/add', checkAuthAdmin, upload.single('file'), DocumentController.addNewDocument);
+app.post('/document/update/:id', checkAuthAdmin, upload.single('file'), DocumentController.updateDocument);
+app.post('/document/delete/:id', checkAuthAdmin, DocumentController.deleteDocument);
 
 
 const port = process.env.PORT || 4000;
