@@ -2,6 +2,9 @@ import Document from "../models/Document.js";
 import DocumentCategory from "../models/DocumentCategory.js";
 import { validationResult } from "express-validator";
 import { ObjectId } from "mongodb";
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 export const addNewDocumentCategory = async (req, res) => {
      try {
@@ -69,8 +72,8 @@ export const updateDocumentCategory = async (req, res) => {
           const updatedDocumentCategory = await DocumentCategory.findByIdAndUpdate(
                req.params.id,
                {
-                    title: req.params.title,
-                    link: req.params.link.trim()
+                    title: req.body.title,
+                    link: req.body.link.trim()
                }
           );
 
@@ -149,6 +152,7 @@ export const addNewDocument = async (req, res) => {
 export const updateDocument = async (req, res) => {
      try {
           const beforeUpdate = await Document.findById(req.params.id);
+          console.log("\n" + beforeUpdate + "\n");
           let updatedObject = {
                name: {
                     kz: req.body.kzName.trim(),
@@ -159,7 +163,7 @@ export const updateDocument = async (req, res) => {
           }
 
           if (req.file) {
-               updatedObject.filename = req.file.originalname;
+               updatedObject.filename = req.file.filename;
           }
 
           const updatedDocument = await Document.findByIdAndUpdate(
@@ -167,7 +171,7 @@ export const updateDocument = async (req, res) => {
                updatedObject
           );
 
-          if (updatedDocument.matchedCount === 0) {
+          if (!updatedDocument) {
                res.status(404).json({
                     message: 'Document not found'
                });
@@ -199,6 +203,16 @@ export const updateDocument = async (req, res) => {
                          message: 'Couldn`t update new category'
                     });
                }
+
+               const filePath = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'uploads', 'documents', beforeUpdate.filename);
+
+               fs.unlink(filePath, (err) => {
+                    if (err) {
+                         console.error(err);
+                         return;
+                    }
+                    console.log('File has been deleted successfully');
+               });
           }
 
           res.json(updatedDocument);
@@ -212,18 +226,21 @@ export const updateDocument = async (req, res) => {
 
 export const deleteDocument = async (req, res) => {
      try {
-          const doc = await Document.findById(req.params.id);
-          const deletedDocument = await Document.findByIdAndDelete(req.params.id);
-          if (!deletedDocument) {
-               res.status(404).json({
-                    message: 'Document did not delete'
+          const beforeDelete = await Document.findById(req.params.id);
+          try {
+               await Document.findByIdAndDelete(req.params.id);
+          } catch (error) {
+               console.log(error);
+               res.status(500).json({
+                    message: error.message
                });
           }
+          
 
           const updatedCategory = await DocumentCategory.findByIdAndUpdate(
-               doc.documentCategory,
+               beforeDelete.documentCategory,
                {
-                    $pull: {documents: doc._id}
+                    $pull: {documents: beforeDelete._id}
                }
           );
 
@@ -232,6 +249,17 @@ export const deleteDocument = async (req, res) => {
                     message: 'Category did not update'
                });
           }
+
+          const filePath = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'uploads', 'documents', beforeDelete.filename);
+
+          fs.unlink(filePath, (err) => {
+               if (err) {
+                    console.error(err);
+                    return;
+               }
+               console.log('File has been deleted successfully');
+          });
+
           res.json({
                message: 'Document successfully deleted'
           });

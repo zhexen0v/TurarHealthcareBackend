@@ -10,13 +10,14 @@ import { addParentPageValidator } from './validators/parentPageValidator.js';
 import checkAuthAdmin from './middlewares/checkAuthAdmin.js';
 import multer from 'multer';
 
+
 mongoose.set("strictQuery", false);
 mongoose.connect(
      'mongodb+srv://admin:fDJOm5IhWXOwd0Hp@cluster0.5cekcxl.mongodb.net/TurarHealthcare?retryWrites=true&w=majority'
 ).then(() => {
      console.log('DB connected');
 }).catch((err) => {
-     console.log("DB didn't connect", err);
+     console.log("DB didn't connect\n", err);
 });
 
 const sendFileToNecessaryFolder = (url) => {
@@ -38,7 +39,7 @@ const storage = multer.diskStorage({
           callback(null, sendFileToNecessaryFolder(req.url));
      },
      filename: (_, file, callback) => {
-          callback(null, file.originalname);
+          callback(null, Buffer.from(file.originalname, 'latin1').toString('utf8'));
      }
 });
 

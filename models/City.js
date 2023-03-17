@@ -15,31 +15,31 @@ const MultilingualSchema = new mongoose.Schema({
      }
 }, {_id: false})
 
-const BlogSchema = new mongoose.Schema({
-     title: {
+const CitySchema = new mongoose.Schema({
+     name: {
           type: MultilingualSchema,
-          required: true,
+          required: true
      },
      content: {
           type: MultilingualSchema,
-          required: true,
-     },
-     imageUrl: {
-          type: String,
-          required: true,
-     },
-     isRelatedToCity: {
-          type: Boolean, 
           required: true
      },
-     city: {
-          type: mongoose.Schema.Types.ObjectId,
-          required: function() {
-               return this.isRelatedToCity;
-          }
-     }   
-}, {
-     timestamps: true
+     link: {
+          type: String,
+          required: true
+     },
+     blog: {
+          type: [mongoose.Schema.Types.ObjectId],
+          ref: 'Blog',
+          required: true
+     }
 });
 
-export default mongoose.model('Blog', BlogSchema, "blog");
+CitySchema.pre('save', function(next) {
+     if(!this.blog.length) {
+          this.blog = [];
+     }
+     next();
+});
+
+export default mongoose.model('City', CitySchema);

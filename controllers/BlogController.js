@@ -1,4 +1,5 @@
 import Blog from "../models/Blog.js";
+import City from '../models/City.js';
 import { validationResult } from "express-validator";
 
 export const addNewArticleIntoBlog = async (req, res) => {
@@ -8,10 +9,10 @@ export const addNewArticleIntoBlog = async (req, res) => {
                return res.status(400).json(errors.array());
           }
           const newDocument = new Blog({
-               kz: JSON.parse(req.body.json).kz,
-               ru: JSON.parse(req.body.json).ru,
-               en: JSON.parse(req.body.json).en,
-               imageUrl: req.file.originalname
+               title: JSON.parse(req.body.json).title,
+               content: JSON.parse(req.body.json).content,
+               imageUrl: req.file.originalname,
+               isRelatedToCity: req.body.isRelatedToCity
           });
 
           const newArticle = await newDocument.save();
@@ -28,10 +29,11 @@ export const addNewArticleIntoBlog = async (req, res) => {
 
 export const updateArticleIntoBlog = async (req, res) => {
      try {
+          const beforeUpdate = await Blog.findById(req.body.id);
           let updatedObj = {
-               kz: JSON.parse(req.body.json).kz,
-               ru: JSON.parse(req.body.json).ru,
-               en: JSON.parse(req.body.json).en,
+               title: JSON.parse(req.body.json).title,
+               content: JSON.parse(req.body.json).content,
+               isRelatedToCity: req.body.isRelatedToCity
           }
           if(req.file) {
                updatedObj.imageUrl = req.file.originalname;
@@ -45,6 +47,31 @@ export const updateArticleIntoBlog = async (req, res) => {
                     message: 'Article not found'
                });
           }
+          if (beforeUpdate.isRelatedToCity && beforeUpdate.city !== req.body.city) {
+               const updatePreviousCity = await City.findByIdAndUpdate(
+                    beforeUpdate.city,
+                    {
+                         $pull: {blog: req.body.id}
+                    }
+               );
+               if (!updatePreviousCity) {
+                    return res.status(404).json({
+                         message: 'Data of previous city did not update'
+                    });
+               }
+
+               const updateNewCity = await City.findByIdAndUpdate(
+                    beforeUpdate.city,
+                    {
+                         $addToSet: {blog: req.body.id}
+                    }
+               );
+               if (!updateNewCity) {
+                    return res.status(404).json({
+                         message: 'Data of new city did not update'
+                    });
+               }
+          }
           res.json(updatedArticle);
      } catch (error) {
           console.log(error);
@@ -57,6 +84,28 @@ export const updateArticleIntoBlog = async (req, res) => {
 export const showAllArticles = async (req, res) => {
      try {
           const allArticles = await Blog.find().sort({createdAt: -1});
+          if (allArticles.length === 0) {
+               res.status(400).json({
+                    message: 'Articles not found'
+               });
+          }
+          res.json(allArticles);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          });
+     }
+}
+
+export const showAllArticlesByCity = async (req, res) => {
+     try {
+          const allArticles = await Blog.find(
+               {$and: [
+                    {isRelatedToCity: true}, 
+                    {city: req.body.city}
+               ]}).sort({createdAt: -1});
+
           if (allArticles.length === 0) {
                res.status(400).json({
                     message: 'Articles not found'
