@@ -10,7 +10,7 @@ export const addOrUpdateNestedPageValidator = [
      body("title.kz")
           .exists({ checkFalsy: true })
           .withMessage("Обязательное поле")
-          .isString().isString()
+          .isString()
           .withMessage("Title(kz) should be string"),
 
      body("title.ru")

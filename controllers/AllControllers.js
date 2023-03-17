@@ -4,3 +4,4 @@ export * as BlogController from './BlogController.js';
 export * as PartnerController from './PartnerController.js';
 export * as PageController from './PageController.js';
 export * as DocumentController from './DocumentController.js';
+export * as CityController from './CityController.js';

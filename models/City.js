@@ -13,6 +13,17 @@ const MultilingualSchema = new mongoose.Schema({
           type: String,
           required: true,
      }
+}, {_id: false});
+
+const CoordinatesSchema = new mongoose.Schema({
+     horizontal: {
+          type: Number, 
+          required: true
+     },
+     vertical: {
+          type: Number, 
+          required: true
+     }
 }, {_id: false})
 
 const CitySchema = new mongoose.Schema({
@@ -26,6 +37,10 @@ const CitySchema = new mongoose.Schema({
      },
      link: {
           type: String,
+          required: true
+     },
+     coordinates: {
+          type: CoordinatesSchema,
           required: true
      },
      blog: {

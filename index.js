@@ -1,12 +1,21 @@
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import { AdminController, GeneralInformationController, BlogController, PartnerController, PageController, DocumentController } from './controllers/AllControllers.js';
+import { 
+     AdminController, 
+     GeneralInformationController, 
+     BlogController, 
+     PartnerController, 
+     PageController, 
+     DocumentController,
+     CityController
+} from './controllers/AllControllers.js';
 import { adminRegisterValidator, adminLoginValidator } from './validators/adminValidator.js';
 import { updateGeneralInformtaionValidator } from './validators/generalInformationValidator.js';
 import { documentCategoryAddOrUpdateValidator } from './validators/documentCategoryValidator.js';
 import { addOrUpdatePartner } from './validators/partnerValidator.js';
 import { addParentPageValidator } from './validators/parentPageValidator.js';
+import { addOrUpdateCityValidator } from './validators/cityValidator.js';
 import checkAuthAdmin from './middlewares/checkAuthAdmin.js';
 import multer from 'multer';
 
@@ -98,6 +107,13 @@ app.get('/document/category/:link', DocumentController.getDocumentCategoryByLink
 app.post('/document/add', checkAuthAdmin, upload.single('file'), DocumentController.addNewDocument);
 app.post('/document/update/:id', checkAuthAdmin, upload.single('file'), DocumentController.updateDocument);
 app.post('/document/delete/:id', checkAuthAdmin, DocumentController.deleteDocument);
+
+/* Cities */
+app.post('/city/add', checkAuthAdmin, addOrUpdateCityValidator, CityController.addNewCity);
+app.post('/city/update/:id', checkAuthAdmin, addOrUpdateCityValidator, CityController.updateCity);
+app.post('/city/delete/:id', checkAuthAdmin, CityController.deleteCity);
+app.get('/city/all', CityController.getAllCities);
+app.get('/city/:link', CityController.getCityByLink);
 
 
 const port = process.env.PORT || 4000;
