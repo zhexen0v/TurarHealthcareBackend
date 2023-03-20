@@ -29,7 +29,7 @@ export const addNewCity = async (req, res) => {
 
 export const getAllCities = async (req, res) => {
      try {
-          const cities = await City.find().sort({'name.ru': -1});
+          const cities = await City.find().sort({'name.ru': 1});
           res.json(cities);
      } catch (error) {
           console.log(error);

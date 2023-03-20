@@ -1,11 +1,12 @@
 import Document from "../models/Document.js";
 import DocumentCategory from "../models/DocumentCategory.js";
+import NestedPage from "../models/NestedPage.js";
 import { validationResult } from "express-validator";
 import { ObjectId } from "mongodb";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
-
+/*
 export const addNewDocumentCategory = async (req, res) => {
      try {
           const errors = validationResult(req);
@@ -113,7 +114,7 @@ export const deleteDocumentCategory = async (req, res) => {
           })
      }
 }
-
+*/
 export const addNewDocument = async (req, res) => {
      try {
           const newDoc = new Document({
@@ -122,12 +123,12 @@ export const addNewDocument = async (req, res) => {
                     ru: req.body.ruName.trim(),
                     en: req.body.enName.trim()
                },
-               documentCategory: req.body.documentCategory,
+               pageId: req.body.pageId,
                filename: req.file.originalname
           });
           const newDocument = await newDoc.save();
 
-          const updatedDocumentCategory = await DocumentCategory.findByIdAndUpdate(
+          const updatedNestedPage = await DocumentCategory.findByIdAndUpdate(
                req.body.documentCategory,
                {
                     $addToSet: {documents: newDocument._id}

@@ -15,7 +15,26 @@ export const addNewArticleIntoBlog = async (req, res) => {
                isRelatedToCity: req.body.isRelatedToCity
           });
 
+          if (req.body.isRelatedToCity) {
+               newDocument.city = req.body.city;
+          }
+
           const newArticle = await newDocument.save();
+
+          if (req.body.isRelatedToCity === 'true') {
+               const updatedCity = await City.findByIdAndUpdate(
+                    req.body.city,
+                    {
+                         $addToSet: {blog: newArticle._id}
+                    }
+               );  
+               if (!updatedCity) {
+                    res.status(404).json({
+                         message: 'City not updated'
+                    })
+               }
+          }
+ 
           
           res.json(newArticle);
           
@@ -33,7 +52,10 @@ export const updateArticleIntoBlog = async (req, res) => {
           let updatedObj = {
                title: JSON.parse(req.body.json).title,
                content: JSON.parse(req.body.json).content,
-               isRelatedToCity: req.body.isRelatedToCity
+               isRelatedToCity: req.body.isRelatedToCity,
+          }
+          if(req.body.isRelatedToCity !== 'false') {
+               updatedObj.city = req.body.city;
           }
           if(req.file) {
                updatedObj.imageUrl = req.file.originalname;
@@ -47,7 +69,34 @@ export const updateArticleIntoBlog = async (req, res) => {
                     message: 'Article not found'
                });
           }
-          if (beforeUpdate.isRelatedToCity && beforeUpdate.city !== req.body.city) {
+
+
+          if (!beforeUpdate.city && req.body.isRelatedToCity === 'true') {
+               await City.findByIdAndUpdate(
+                    req.body.city,
+                    {
+                         $addToSet: {blog: req.body.id}
+                    }
+               );
+          }
+
+          if (beforeUpdate.city && req.body.isRelatedToCity === 'false') {
+               await City.findByIdAndUpdate(
+                    beforeUpdate.city,
+                    {
+                         $pull: {blog: req.body.id}
+                    }
+               );
+
+               await Blog.findByIdAndUpdate(
+                    req.body.id,
+                    {
+                         $unset: {city: 1}
+                    }
+               );
+          }
+
+          if (beforeUpdate.isRelatedToCity === 'true' && beforeUpdate.city !== req.body.city) {
                const updatePreviousCity = await City.findByIdAndUpdate(
                     beforeUpdate.city,
                     {
@@ -61,7 +110,7 @@ export const updateArticleIntoBlog = async (req, res) => {
                }
 
                const updateNewCity = await City.findByIdAndUpdate(
-                    beforeUpdate.city,
+                    req.body.city,
                     {
                          $addToSet: {blog: req.body.id}
                     }

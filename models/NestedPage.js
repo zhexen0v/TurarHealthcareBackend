@@ -25,18 +25,36 @@ const NestedPageSchema = new mongoose.Schema({
           type: MultilingualSchema,
           required: true
      },
-     content: {
-          type: MultilingualSchema,
-          required: true
-     },
      link: {
           type: String,
           required: true,
+     },
+     isListOfDocuments: {
+          type: Boolean,
+          required: false
+     },
+     content: {
+          type: MultilingualSchema,
+          required: function() {
+               return !this.isListOfDocuments;
+          }
+     },
+     documents: {
+          type: [mongoose.Schema.Types.ObjectId],
+          ref: 'Document',
+          required: function () {
+               return this.isListOfDocuments;
+          }
      }
-},
-{
+}, {
      timestamps: true
-}
-);
+});
+
+NestedPageSchema.pre('save', function(next) {
+     if(!this.documents.length) {
+          this.documents = [];
+     }
+     next();
+});
 
 export default mongoose.model('NestedPage', NestedPageSchema);

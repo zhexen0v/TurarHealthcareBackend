@@ -1,5 +1,6 @@
 import ParentPage from "../models/ParentPage.js";
 import NestedPage from "../models/NestedPage.js";
+import Document from "../models/Document.js";
 
 export const addNewParentPage = async (req, res) => {
      try {
@@ -99,9 +100,14 @@ export const addNewNestedPage = async (req, res) => {
           const newDocument = new NestedPage({
                parentPage: req.body.parentPage,
                title: req.body.title,
-               content: req.body.content,
+               isListOfDocuments: req.body.isListOfDocuments,
                link: req.body.link.trim()
           });
+          if (req.body.isListOfDocuments) {
+               newDocument.documents = req.body.documents;
+          } else {
+               newDocument.content = req.body.content;
+          }
           const newNestedPage = await newDocument.save();
           const updatedParentPage = await ParentPage.updateOne({
                _id: req.body.parentPage
@@ -127,13 +133,21 @@ export const addNewNestedPage = async (req, res) => {
 
 export const updateNestedPage = async (req, res) => {
      try {
+          const beforeUpdate =  await NestedPage.findById(req.body.id);
+          const updatedObj = {
+               title: req.body.title,
+               link: req.body.link
+          }
+
+          if (beforeUpdate.isListOfDocuments) {
+               updatedObj.documents = req.body.documents;
+          } else {
+               updatedObj.content = req.body.content;
+          }
+
           const updatedPage = await NestedPage.findByIdAndUpdate(
                req.body.id,
-               {
-                    title: req.body.title,
-                    content: req.body.content,
-                    link: req.body.link
-               }
+               updatedObj
           );
           if (updatedPage.modifiedCount === 0) {
                res.status(400).json({
@@ -141,6 +155,40 @@ export const updateNestedPage = async (req, res) => {
                });
           }
           res.json(updatedPage);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          })
+     }
+}
+
+export const deleteNestedPage = async (req, res) => {
+     try {
+          const beforeDelete = await NestedPage.findById(req.params.id);
+          console.log(beforeDelete);
+          try {
+               await NestedPage.findByIdAndDelete(req.params.id);
+          } catch (error) {
+               res.status(500).json({
+                    message: error.message
+               });
+          }
+
+          if (beforeDelete.isListOfDocuments) {
+               try {
+                    await Document.deleteMany({pageId: req.params.id})
+               } catch (error) {
+                    res.status(500).json({
+                         message: error.message
+                    }); 
+               }
+          }
+
+          res.json({
+               message: 'Nested Page successfully deleted'
+          })
+
      } catch (error) {
           console.log(error);
           res.status(500).json({

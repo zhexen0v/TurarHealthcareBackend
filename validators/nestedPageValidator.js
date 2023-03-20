@@ -24,7 +24,7 @@ export const addOrUpdateNestedPageValidator = [
           .withMessage("Обязательное поле")
           .isString()
           .withMessage("Title(en) should be string"),
-     
+     /*
      body("content")
           .exists({ checkFalsy: true })
           .withMessage("Обязательное поле")
@@ -48,7 +48,7 @@ export const addOrUpdateNestedPageValidator = [
           .withMessage("Обязательное поле")
           .isString()
           .withMessage("Content(en) should be string"),
-     
+     */
      body("link")
           .exists({ checkFalsy: true })
           .withMessage("Обязательное поле")

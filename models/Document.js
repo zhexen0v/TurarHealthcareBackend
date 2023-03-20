@@ -20,9 +20,9 @@ const DocumentSchema = new mongoose.Schema({
           type: MultilingualSchema,
           required: true
      },
-     documentCategory: {
+     pageId: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'DocumentCategory',
+          ref: 'NestedPage',
           required: true
      },
      filename: {
