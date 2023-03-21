@@ -186,6 +186,23 @@ export const showLastArticles = async (req, res) => {
      }
 }
 
+export const showLastArticlesExceptSelected = async (req, res) => {
+     try {
+          const allArticles = await Blog.find({_id: {$ne: req.params.id}}).sort({createdAt: -1}).limit(3);
+          if (allArticles.length === 0) {
+               res.status(400).json({
+                    message: 'Articles not found'
+               });
+          }
+          res.json(allArticles);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          });
+     }
+}
+
 export const showArticleById = async (req, res) => {
      try {
           const article = await Blog.findById(req.params.id);

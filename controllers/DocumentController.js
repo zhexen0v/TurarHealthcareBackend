@@ -128,14 +128,14 @@ export const addNewDocument = async (req, res) => {
           });
           const newDocument = await newDoc.save();
 
-          const updatedNestedPage = await DocumentCategory.findByIdAndUpdate(
-               req.body.documentCategory,
+          const updatedNestedPage = await NestedPage.findByIdAndUpdate(
+               req.body.pageId,
                {
                     $addToSet: {documents: newDocument._id}
                }
           );
 
-          if (!updatedDocumentCategory) {
+          if (!updatedNestedPage) {
                res.status(400).json({
                     message: 'Can not update category'
                });
@@ -152,15 +152,13 @@ export const addNewDocument = async (req, res) => {
 
 export const updateDocument = async (req, res) => {
      try {
-          const beforeUpdate = await Document.findById(req.params.id);
-          console.log("\n" + beforeUpdate + "\n");
           let updatedObject = {
                name: {
                     kz: req.body.kzName.trim(),
                     ru: req.body.ruName.trim(),
                     en: req.body.enName.trim()
                },
-               documentCategory: req.body.documentCategory
+               pageId: req.body.pageId
           }
 
           if (req.file) {
@@ -175,44 +173,6 @@ export const updateDocument = async (req, res) => {
           if (!updatedDocument) {
                res.status(404).json({
                     message: 'Document not found'
-               });
-          }
-
-          if (beforeUpdate.documentCategory !== req.body.documentCategory) {
-               const updatedNewCategory = await DocumentCategory.findByIdAndUpdate(
-                    req.body.documentCategory,
-                    {
-                         $addToSet: {documents: beforeUpdate._id}
-                    }
-               );
-     
-               if (!updatedNewCategory) {
-                    res.status(404).json({
-                         message: 'Couldn`t update new category'
-                    });
-               }
-     
-               const updatedPreviousCategory = await DocumentCategory.findByIdAndUpdate(
-                    beforeUpdate.documentCategory,
-                    {
-                         $pull: {documents: beforeUpdate._id}
-                    }
-               );
-     
-               if (!updatedPreviousCategory) {
-                    res.status(404).json({
-                         message: 'Couldn`t update new category'
-                    });
-               }
-
-               const filePath = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'uploads', 'documents', beforeUpdate.filename);
-
-               fs.unlink(filePath, (err) => {
-                    if (err) {
-                         console.error(err);
-                         return;
-                    }
-                    console.log('File has been deleted successfully');
                });
           }
 
@@ -238,8 +198,8 @@ export const deleteDocument = async (req, res) => {
           }
           
 
-          const updatedCategory = await DocumentCategory.findByIdAndUpdate(
-               beforeDelete.documentCategory,
+          const updatedCategory = await NestedPage.findByIdAndUpdate(
+               beforeDelete.pageId,
                {
                     $pull: {documents: beforeDelete._id}
                }
@@ -264,6 +224,23 @@ export const deleteDocument = async (req, res) => {
           res.json({
                message: 'Document successfully deleted'
           });
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          })
+     }
+}
+
+export const showDocumentsByPage = async (req, res) => {
+     try {
+          const documents = await Document.find({pageId: req.params.id});
+          if (!documents) {
+               res.status(400).json({
+                    message: 'Documents not found'
+               });
+          }
+          res.json(documents);
      } catch (error) {
           console.log(error);
           res.status(500).json({

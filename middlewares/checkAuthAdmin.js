@@ -7,9 +7,9 @@ export default (req, res, next) => {
                next();
           } catch (error) {
                console.log(error);
-               return res.status(403).json({
-                    message: 'Can not verify admin'
-               });
+                    return res.status(403).json({
+                         message: 'Can not verify admin'
+                    });
           }
      } else{
           return res.status(403).json({

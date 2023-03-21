@@ -78,6 +78,7 @@ app.post('/bg/change', checkAuthAdmin, upload.single('bg'), GeneralInformationCo
 /* Blog */
 app.get('/blog', BlogController.showAllArticles);
 app.get('/blog/latest', BlogController.showLastArticles);
+app.get('/blog/latest/:id', BlogController.showLastArticlesExceptSelected);
 app.get('/blog/:id', BlogController.showArticleById);
 app.post('/blog/add', checkAuthAdmin, upload.single("blog"), BlogController.addNewArticleIntoBlog);
 app.post('/blog/update', checkAuthAdmin, upload.single("blog"), BlogController.updateArticleIntoBlog);
@@ -99,14 +100,10 @@ app.post('/page/nested/add', checkAuthAdmin, PageController.addNewNestedPage);
 app.post('/page/nested/update', checkAuthAdmin, PageController.updateNestedPage);
 app.post('/page/nested/delete/:id', checkAuthAdmin, PageController.deleteNestedPage);
 /* Documents */
-// app.post('/document/category/add', checkAuthAdmin, documentCategoryAddOrUpdateValidator, DocumentController.addNewDocumentCategory);
-// app.post('/document/category/update/:id', checkAuthAdmin, documentCategoryAddOrUpdateValidator, DocumentController.updateDocumentCategory);
-// app.post('/document/category/delete/:id', checkAuthAdmin, DocumentController.deleteDocumentCategory);
-// app.get('/document/category', DocumentController.getAllDocumentCategories);
-// app.get('/document/category/:link', DocumentController.getDocumentCategoryByLink);
-// app.post('/document/add', checkAuthAdmin, upload.single('file'), DocumentController.addNewDocument);
-// app.post('/document/update/:id', checkAuthAdmin, upload.single('file'), DocumentController.updateDocument);
-// app.post('/document/delete/:id', checkAuthAdmin, DocumentController.deleteDocument);
+app.post('/document/add', checkAuthAdmin, upload.single('file'), DocumentController.addNewDocument);
+app.post('/document/update/:id', checkAuthAdmin, upload.single('file'), DocumentController.updateDocument);
+app.post('/document/delete/:id', checkAuthAdmin, DocumentController.deleteDocument);
+app.get('/documents/:id', DocumentController.showDocumentsByPage);
 
 /* Cities */
 app.post('/city/add', checkAuthAdmin, addOrUpdateCityValidator, CityController.addNewCity);

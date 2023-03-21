@@ -50,11 +50,4 @@ const NestedPageSchema = new mongoose.Schema({
      timestamps: true
 });
 
-NestedPageSchema.pre('save', function(next) {
-     if(!this.documents.length) {
-          this.documents = [];
-     }
-     next();
-});
-
 export default mongoose.model('NestedPage', NestedPageSchema);

@@ -54,17 +54,18 @@ export const showAllPages = async(req, res) => {
 
 export const showPageByLink = async (req, res) => {
      try {
-          const data = await ParentPage.find({isNested: true}).populate('nestedPages').exec();
-          let dataOfPage = {};
-          const arrayOfPages = [];
-          data.forEach(page => {
-               arrayOfPages.push(...page.nestedPages);
-          });
-          arrayOfPages.forEach(p => {
-               if (p.link === req.params.link) {
-                    dataOfPage = p;
-               }
-          });
+          const dataOfPage = await NestedPage.findOne({link: req.params.link}).populate('documents').exec();
+          // const data = await ParentPage.find({isNested: true}).populate('nestedPages').exec();
+          // let dataOfPage = {};
+          // const arrayOfPages = [];
+          // data.forEach(page => {
+          //      arrayOfPages.push(...page.nestedPages);
+          // });
+          // arrayOfPages.forEach(p => {
+          //      if (p.link === req.params.link) {
+          //           dataOfPage = p;
+          //      }
+          // });
           const parentPage = await ParentPage.findById(dataOfPage.parentPage).populate('nestedPages').exec();
           res.json({
                data: dataOfPage,
@@ -139,9 +140,7 @@ export const updateNestedPage = async (req, res) => {
                link: req.body.link
           }
 
-          if (beforeUpdate.isListOfDocuments) {
-               updatedObj.documents = req.body.documents;
-          } else {
+          if (!beforeUpdate.isListOfDocuments) {
                updatedObj.content = req.body.content;
           }
 
@@ -166,7 +165,7 @@ export const updateNestedPage = async (req, res) => {
 export const deleteNestedPage = async (req, res) => {
      try {
           const beforeDelete = await NestedPage.findById(req.params.id);
-          console.log(beforeDelete);
+          console.log(req.params.id);
           try {
                await NestedPage.findByIdAndDelete(req.params.id);
           } catch (error) {
