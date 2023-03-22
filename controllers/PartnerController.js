@@ -32,6 +32,10 @@ export const addNewPartner = async (req, res) => {
                imageUrl: req.file.filename
           });
 
+          if (req.body.link) {
+               newDocument.link = req.body.link;
+          }
+
           const newPartner = await newDocument.save();
           res.json(newPartner);
      } catch (error) {
@@ -53,6 +57,9 @@ export const updatePartner = async (req, res) => {
                kzTitle: req.body.kz,
                ruTitle: req.body.ru,
                enTitle: req.body.en,
+          }
+          if (req.body.link) {
+               updatedObj.link = req.body.link;
           }
           if (req.file) {
                updatedObj.imageUrl = req.file.filename;

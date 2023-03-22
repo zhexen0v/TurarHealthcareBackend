@@ -98,3 +98,20 @@ export const changeHomeBackgroundImage = async (req, res) => {
           })
      }
 }
+
+export const changeListOfNumbers = async (req, res) => {
+     try {
+          const updatedListOfNumbers = await Generalnformation.updateOne({}, {listOfNumbers: req.file.filename});
+          if (!updatedListOfNumbers) {
+               res.status(400).json({
+                    message: 'List of numbers not found'
+               });  
+          }
+          res.json(updatedListOfNumbers);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          })
+     }
+}

@@ -55,6 +55,10 @@ const GeneralnformationSchema = new mongoose.Schema({
      homeBgImage: {
           type: String,
           required: false
+     },
+     listOfNumbers: {
+          type: String,
+          required: false
      }
 });
 

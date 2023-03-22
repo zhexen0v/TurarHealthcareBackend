@@ -38,6 +38,8 @@ const sendFileToNecessaryFolder = (url) => {
           return 'uploads/partners';
      } else if (url.startsWith('/document')) {
           return 'uploads/documents'
+     } else if (url.startsWith('/phone')) {
+          return 'uploads/contacts'
      } else {
           return 'uploads';
      }
@@ -63,7 +65,7 @@ app.use('/uploads/blog', express.static('uploads/blog'));
 app.use('/uploads/backgrounds', express.static('uploads/backgrounds'));
 app.use('/uploads/partners', express.static('uploads/partners'));
 app.use('/uploads/documents', express.static('uploads/documents'));
-
+app.use('/uploads/contacts', express.static('uploads/contacts'));
 
 /* Admin registration/login */
 app.post('/register', checkAuthAdmin, adminRegisterValidator, AdminController.register);
@@ -74,7 +76,7 @@ app.post('/general/update', checkAuthAdmin, updateGeneralInformtaionValidator, G
 app.post('/general/initial', checkAuthAdmin, updateGeneralInformtaionValidator, GeneralInformationController.initialInsert);
 app.post('/homebg/change', checkAuthAdmin, upload.single('homebg'), GeneralInformationController.changeHomeBackgroundImage);
 app.post('/bg/change', checkAuthAdmin, upload.single('bg'), GeneralInformationController.changeBackgroundImage);
-
+app.post('/phone/change', checkAuthAdmin, upload.single('phone'), GeneralInformationController.changeListOfNumbers);
 /* Blog */
 app.get('/blog', BlogController.showAllArticles);
 app.get('/blog/latest', BlogController.showLastArticles);
