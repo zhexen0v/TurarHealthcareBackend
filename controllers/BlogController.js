@@ -1,6 +1,9 @@
 import Blog from "../models/Blog.js";
 import City from '../models/City.js';
 import { validationResult } from "express-validator";
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 export const addNewArticleIntoBlog = async (req, res) => {
      try {
@@ -11,7 +14,7 @@ export const addNewArticleIntoBlog = async (req, res) => {
           const newDocument = new Blog({
                title: JSON.parse(req.body.json).title,
                content: JSON.parse(req.body.json).content,
-               imageUrl: req.file.originalname,
+               imageUrl: Buffer.from(req.file.originalname, 'latin1').toString('utf8'),
                isRelatedToCity: req.body.isRelatedToCity
           });
 
@@ -58,7 +61,7 @@ export const updateArticleIntoBlog = async (req, res) => {
                updatedObj.city = req.body.city;
           }
           if(req.file) {
-               updatedObj.imageUrl = req.file.originalname;
+               updatedObj.imageUrl = Buffer.from(req.file.originalname, 'latin1').toString('utf8');
           }
           const updatedArticle = await Blog.findByIdAndUpdate(
                req.body.id, 
@@ -222,12 +225,10 @@ export const showArticleById = async (req, res) => {
 
 export const deleteArticle = async (req, res) => {
      try {
-          const deletedArticle = await Blog.findByIdAndDelete(req.params.id);
-          if(deletedArticle.deletedCount !== 1) {
-               res.status(400).json({
-                    message: 'Article not deleted'
-               });
-          }
+          const beforeDelete = await Blog.findById(req.params.id);
+          await Blog.findByIdAndDelete(req.params.id);
+          deleteFileFromFolder('blog', beforeDelete.imageUrl);
+          
      } catch (error) {
           console.log(error);
           res.status(500).json({

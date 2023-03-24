@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
+import nodemailer from 'nodemailer';
 import { 
      AdminController, 
      GeneralInformationController, 
@@ -40,6 +41,8 @@ const sendFileToNecessaryFolder = (url) => {
           return 'uploads/documents'
      } else if (url.startsWith('/phone')) {
           return 'uploads/contacts'
+     } else if (url.startsWith('/editor')) {
+          return 'uploads/editor';
      } else {
           return 'uploads';
      }
@@ -55,6 +58,31 @@ const storage = multer.diskStorage({
 });
 
 
+const transporter = nodemailer.createTransport({
+     service: 'gmail',
+     auth: {
+         user: 'adilzhexenoff@gmail.com',
+         pass: 'A1r2g3e4n5t6u7m'
+     }
+});
+
+function sendEmail() {
+     const mailOptions = {
+          from: 'adilzhexenoff@gmail.com',
+          to: 'nescrypnoadil@gmail.com',
+          subject: 'subject',
+          text: 'body'
+     };
+
+     transporter.sendMail(mailOptions, function(error, info){
+          if (error) {
+               console.log(error);
+          } else {
+               console.log('Email sent: ' + info.response);
+          }
+     });
+}
+
 
 const upload = multer({ storage });
 
@@ -66,6 +94,7 @@ app.use('/uploads/backgrounds', express.static('uploads/backgrounds'));
 app.use('/uploads/partners', express.static('uploads/partners'));
 app.use('/uploads/documents', express.static('uploads/documents'));
 app.use('/uploads/contacts', express.static('uploads/contacts'));
+app.use('/uploads/editor', express.static('uploads/editor'));
 
 /* Admin registration/login */
 app.post('/register', checkAuthAdmin, adminRegisterValidator, AdminController.register);
@@ -114,6 +143,11 @@ app.post('/city/delete/:id', checkAuthAdmin, CityController.deleteCity);
 app.get('/city/all', CityController.getAllCities);
 app.get('/city/:link', CityController.getCityByLink);
 
+/* Mail */
+app.post('/mail', (req, res) => {
+     sendEmail();
+     res.send('S');
+});
 
 const port = process.env.PORT || 4000;
 

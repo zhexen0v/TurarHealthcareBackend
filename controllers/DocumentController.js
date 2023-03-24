@@ -1,11 +1,6 @@
 import Document from "../models/Document.js";
-import DocumentCategory from "../models/DocumentCategory.js";
 import NestedPage from "../models/NestedPage.js";
-import { validationResult } from "express-validator";
-import { ObjectId } from "mongodb";
-import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
+import { deleteFileFromFolder } from "../utils/utils.js";
 /*
 export const addNewDocumentCategory = async (req, res) => {
      try {
@@ -124,7 +119,7 @@ export const addNewDocument = async (req, res) => {
                     en: req.body.enName.trim()
                },
                pageId: req.body.pageId,
-               filename: req.file.originalname
+               filename: Buffer.from(req.file.originalname, 'latin1').toString('utf8') 
           });
           const newDocument = await newDoc.save();
 
@@ -152,6 +147,7 @@ export const addNewDocument = async (req, res) => {
 
 export const updateDocument = async (req, res) => {
      try {
+          const beforeUpdate = await Document.findById(req.params.id);
           let updatedObject = {
                name: {
                     kz: req.body.kzName.trim(),
@@ -162,7 +158,7 @@ export const updateDocument = async (req, res) => {
           }
 
           if (req.file) {
-               updatedObject.filename = req.file.filename;
+               updatedObject.filename = Buffer.from(req.file.originalname, 'latin1').toString('utf8');
           }
 
           const updatedDocument = await Document.findByIdAndUpdate(
@@ -175,6 +171,8 @@ export const updateDocument = async (req, res) => {
                     message: 'Document not found'
                });
           }
+
+          deleteFileFromFolder('documents', beforeDelete.filename);
 
           res.json(updatedDocument);
      } catch (error) {
@@ -211,15 +209,7 @@ export const deleteDocument = async (req, res) => {
                });
           }
 
-          const filePath = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'uploads', 'documents', beforeDelete.filename);
-
-          fs.unlink(filePath, (err) => {
-               if (err) {
-                    console.error(err);
-                    return;
-               }
-               console.log('File has been deleted successfully');
-          });
+          deleteFileFromFolder('documents', beforeDelete.filename);
 
           res.json({
                message: 'Document successfully deleted'

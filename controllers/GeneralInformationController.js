@@ -1,5 +1,6 @@
 import Generalnformation from "../models/Generalnformation.js";
 import { validationResult } from "express-validator";
+import { deleteFileFromFolder } from "../utils/utils.js";
 
 export const initialInsert = async (req, res) => {
      try {
@@ -67,12 +68,16 @@ export const showGeneralInformation = async (req, res) => {
 
 export const changeBackgroundImage = async (req, res) => {
      try {
+          const beforeUpdate = await Generalnformation.findOne();
           const updatedBackground = await Generalnformation.updateOne({}, {bgImage: req.file.filename});
           if (!updatedBackground) {
                res.status(400).json({
                     message: 'Background not found'
                });  
           }
+
+          deleteFileFromFolder('backgrounds', beforeUpdate.bgImage);
+
           res.json(updatedBackground);
      } catch (error) {
           console.log(error);
@@ -84,12 +89,16 @@ export const changeBackgroundImage = async (req, res) => {
 
 export const changeHomeBackgroundImage = async (req, res) => {
      try {
+          const beforeUpdate = await Generalnformation.findOne();
           const updatedHomeBackground = await Generalnformation.updateOne({}, {homeBgImage: req.file.filename});
           if (!updatedHomeBackground) {
                res.status(400).json({
                     message: 'Background not found'
                });  
           }
+
+          deleteFileFromFolder('backgrounds', beforeUpdate.homeBgImage);
+
           res.json(updatedHomeBackground);
      } catch (error) {
           console.log(error);
