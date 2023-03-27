@@ -31,21 +31,24 @@ mongoose.connect(
 });
 
 const sendFileToNecessaryFolder = (url) => {
-     if (url.startsWith('/blog')) {
-          return 'uploads/blog';
-     } else if (url.startsWith('/homebg') || url.startsWith('/bg')) {
-          return 'uploads/backgrounds';
-     } else if (url.startsWith('/partner')) {
-          return 'uploads/partners';
-     } else if (url.startsWith('/document')) {
-          return 'uploads/documents'
-     } else if (url.startsWith('/phone')) {
-          return 'uploads/contacts'
-     } else if (url.startsWith('/editor')) {
-          return 'uploads/editor';
-     } else {
-          return 'uploads';
-     }
+     switch (true) {
+          case url.startsWith('/blog'):
+               return 'uploads/blog';
+          case url.startsWith('/homebg') || url.startsWith('/bg'):
+               return 'uploads/backgrounds';
+          case url.startsWith('/partner'):
+               return 'uploads/partners';
+          case url.startsWith('/document'):
+               return 'uploads/documents';
+          case url.startsWith('/phone'):
+               return 'uploads/contacts';
+          case url.startsWith('/editor'):
+               return 'uploads/editor';
+          case url.startsWith('/mail'):
+               return 'uploads/mail'
+          default:
+               return 'uploads';
+        }
 }
 
 const storage = multer.diskStorage({
@@ -121,7 +124,7 @@ app.get('/city/:link', CityController.getCityByLink);
 
 /* Mail */
 app.get('/mail/notanswered', MailController.getAllMailsWithoutAnswers);
-app.post('/mail', MailController.sendMailToChairmanBlog);
+app.post('/mail', upload.array('files'), MailController.sendMailToChairmanBlog);
 
 
 const port = process.env.PORT || 4000;

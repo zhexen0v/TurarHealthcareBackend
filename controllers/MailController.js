@@ -1,23 +1,41 @@
 import Mail from "../models/Mail.js";
 import Mailgun from 'mailgun-js';
+import request from "request";
+import fs from 'fs';
+import path from 'path';
 
-const mailgun = () =>
-     Mailgun({
-          apiKey: '151cc9beef0236e04318248b2f62d0ba-d51642fa-1dd2342e',
-          domain: 'sandbox1b441c945d6749fa99b16da47b3f1f3f.mailgun.org',
-     });
+const mailgun = Mailgun({
+     apiKey: '151cc9beef0236e04318248b2f62d0ba-d51642fa-1dd2342e',
+     domain: 'sandbox1b441c945d6749fa99b16da47b3f1f3f.mailgun.org',
+});
 
 export const sendMailToChairmanBlog = async (req, res) => {
      try {
-          mailgun()
+          let data = {
+               from: `${req.body.email.trim()}`,
+               to: 'adilzhexenov@outlook.com',
+               subject: `Блог председателя | Сообщение от ${req.body.name.trim()} ${req.body.surname.trim()}`,
+               text: req.body.message.trim(),
+          }
+          
+          if (req.files) {
+               const tempFiles = [];
+               req.files.forEach((file) => {
+                    const fileContents = fs.readFileSync(file.path);
+                    const fileBuffer = Buffer.from(fileContents);
+                    const newFile = new mailgun.Attachment({
+                         data: fileBuffer,
+                         filename: file.filename
+                    })
+                    tempFiles.push(newFile);
+               });
+               data.attachment = tempFiles;
+          }
+          console.log(data);
+          mailgun
                .messages()
                .send(
-                    {
-                         from: `${req.body.senderData.email}`,
-                         to: 'adilzhexenov@outlook.com',
-                         subject: `Блог председателя | Сообщение от ${req.body.senderData.name} ${req.body.senderData.surname}`,
-                         text: req.body.message,
-                    },
+                    data,
                     (error, body) => {
                          if (error) {
                               console.log(error);
@@ -29,11 +47,18 @@ export const sendMailToChairmanBlog = async (req, res) => {
                          }
                     }
           );
+          
+          /*
           const newDocument = new Mail({
-               senderData: req.body.senderData,
+               senderData: {
+                    name: req.body.name.trim(),
+                    surname: req.body.surname.trim(),
+                    email: req.body.email.trim()
+               },
                message: req.body.message.trim()
           });
           await newDocument.save();
+          */
      } catch (err) {
           console.log(err);
           res.status(500).json({
