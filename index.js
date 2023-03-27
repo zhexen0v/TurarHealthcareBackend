@@ -1,7 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
-import nodemailer from 'nodemailer';
+import multer from 'multer';
+
+
 import { 
      AdminController, 
      GeneralInformationController, 
@@ -9,17 +11,15 @@ import {
      PartnerController, 
      PageController, 
      DocumentController,
-     CityController
+     CityController,
+     MailController
 } from './controllers/AllControllers.js';
 import { adminRegisterValidator, adminLoginValidator } from './validators/adminValidator.js';
 import { updateGeneralInformtaionValidator } from './validators/generalInformationValidator.js';
-import { documentCategoryAddOrUpdateValidator } from './validators/documentCategoryValidator.js';
 import { addOrUpdatePartner } from './validators/partnerValidator.js';
 import { addParentPageValidator } from './validators/parentPageValidator.js';
 import { addOrUpdateCityValidator } from './validators/cityValidator.js';
 import checkAuthAdmin from './middlewares/checkAuthAdmin.js';
-import multer from 'multer';
-
 
 mongoose.set("strictQuery", false);
 mongoose.connect(
@@ -56,33 +56,6 @@ const storage = multer.diskStorage({
           callback(null, Buffer.from(file.originalname, 'latin1').toString('utf8'));
      }
 });
-
-
-const transporter = nodemailer.createTransport({
-     service: 'gmail',
-     auth: {
-         user: 'adilzhexenoff@gmail.com',
-         pass: 'A1r2g3e4n5t6u7m'
-     }
-});
-
-function sendEmail() {
-     const mailOptions = {
-          from: 'adilzhexenoff@gmail.com',
-          to: 'nescrypnoadil@gmail.com',
-          subject: 'subject',
-          text: 'body'
-     };
-
-     transporter.sendMail(mailOptions, function(error, info){
-          if (error) {
-               console.log(error);
-          } else {
-               console.log('Email sent: ' + info.response);
-          }
-     });
-}
-
 
 const upload = multer({ storage });
 
@@ -130,6 +103,9 @@ app.post('/page/parent/add', checkAuthAdmin, addParentPageValidator, PageControl
 app.post('/page/nested/add', checkAuthAdmin, PageController.addNewNestedPage);
 app.post('/page/nested/update', checkAuthAdmin, PageController.updateNestedPage);
 app.post('/page/nested/delete/:id', checkAuthAdmin, PageController.deleteNestedPage);
+app.post('/page/increment/:id', checkAuthAdmin, PageController.incrementOrderOfPage);
+app.post('/page/decrement/:id', checkAuthAdmin, PageController.decrementOrderOfPage);
+
 /* Documents */
 app.post('/document/add', checkAuthAdmin, upload.single('file'), DocumentController.addNewDocument);
 app.post('/document/update/:id', checkAuthAdmin, upload.single('file'), DocumentController.updateDocument);
@@ -144,10 +120,9 @@ app.get('/city/all', CityController.getAllCities);
 app.get('/city/:link', CityController.getCityByLink);
 
 /* Mail */
-app.post('/mail', (req, res) => {
-     sendEmail();
-     res.send('S');
-});
+app.get('/mail/notanswered', MailController.getAllMailsWithoutAnswers);
+app.post('/mail', MailController.sendMailToChairmanBlog);
+
 
 const port = process.env.PORT || 4000;
 

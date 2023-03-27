@@ -45,6 +45,11 @@ const NestedPageSchema = new mongoose.Schema({
           required: function () {
                return this.isListOfDocuments;
           }
+     },
+     orderNumber: {
+          type: Number,
+          required: false,
+          min: 1
      }
 }, {
      timestamps: true

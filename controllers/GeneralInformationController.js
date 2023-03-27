@@ -69,7 +69,9 @@ export const showGeneralInformation = async (req, res) => {
 export const changeBackgroundImage = async (req, res) => {
      try {
           const beforeUpdate = await Generalnformation.findOne();
-          const updatedBackground = await Generalnformation.updateOne({}, {bgImage: req.file.filename});
+          const updatedBackground = await Generalnformation.updateOne({}, {
+               bgImage: Buffer.from(req.file.originalname, 'latin1').toString('utf8')
+          });
           if (!updatedBackground) {
                res.status(400).json({
                     message: 'Background not found'
@@ -90,7 +92,9 @@ export const changeBackgroundImage = async (req, res) => {
 export const changeHomeBackgroundImage = async (req, res) => {
      try {
           const beforeUpdate = await Generalnformation.findOne();
-          const updatedHomeBackground = await Generalnformation.updateOne({}, {homeBgImage: req.file.filename});
+          const updatedHomeBackground = await Generalnformation.updateOne({}, {
+               homeBgImage: Buffer.from(req.file.originalname, 'latin1').toString('utf8')
+          });
           if (!updatedHomeBackground) {
                res.status(400).json({
                     message: 'Background not found'

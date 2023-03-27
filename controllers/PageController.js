@@ -21,7 +21,13 @@ export const addNewParentPage = async (req, res) => {
 
 export const showAllParentPage = async (req, res) => {
      try {
-          const parentPages = await ParentPage.find().populate('nestedPages', '_id title link').exec();
+          const parentPages = await ParentPage.find()
+          .populate({
+               path: 'nestedPages',
+               select: '_id title link',
+               options: { sort: {orderNumber: 1}}
+          })
+          .exec();
           if (parentPages.length === 0) {
                res.status(400).json({
                     message: 'Pages not found'
@@ -66,14 +72,21 @@ export const showPageByLink = async (req, res) => {
           //           dataOfPage = p;
           //      }
           // });
-          const parentPage = await ParentPage.findById(dataOfPage.parentPage).populate('nestedPages').exec();
+          const parentPage = await ParentPage
+          .findById(dataOfPage.parentPage)
+          .populate({
+               path: 'nestedPages',
+               select: '_id title link',
+               options: { sort: {orderNumber: 1}}
+          })
+          .exec();
           res.json({
                data: dataOfPage,
                parent: parentPage
           });
      } catch (error) {
           console.log(error);
-          res.status(500).json({
+          res.status(404).json({
                message: error.message
           });
      }
@@ -98,11 +111,13 @@ export const showNestedPageById = async (req, res) => {
 
 export const addNewNestedPage = async (req, res) => {
      try {
+          const pages = await NestedPage.find({parentPage: req.body.parentPage});
           const newDocument = new NestedPage({
                parentPage: req.body.parentPage,
                title: req.body.title,
                isListOfDocuments: req.body.isListOfDocuments,
-               link: req.body.link.trim()
+               link: req.body.link.trim(),
+               orderNumber: pages.length + 1
           });
           if (req.body.isListOfDocuments) {
                newDocument.documents = req.body.documents;
@@ -193,5 +208,53 @@ export const deleteNestedPage = async (req, res) => {
           res.status(500).json({
                message: error.message
           })
+     }
+}
+
+export const incrementOrderOfPage = async (req, res) => {
+     try {
+          await NestedPage.findByIdAndUpdate(
+               req.params.id,
+               {
+                    $inc: {orderNumber: -1} 
+               }
+          )
+          const page = await NestedPage.findById(req.params.id);
+          await NestedPage.updateOne({$and: [
+               {_id: {$ne: page._id}},
+               {orderNumber: page.orderNumber}
+          ]}, {
+               $inc: {orderNumber: 1}
+          })
+          res.json(page);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          });
+     }
+}
+
+export const decrementOrderOfPage = async (req, res) => {
+     try {
+          await NestedPage.findByIdAndUpdate(
+               req.params.id,
+               {
+                    $inc: {orderNumber: 1} 
+               }
+          )
+          const page = await NestedPage.findById(req.params.id);
+          await NestedPage.updateOne({$and: [
+               {_id: {$ne: page._id}},
+               {orderNumber: page.orderNumber}
+          ]}, {
+               $inc: {orderNumber: -1}
+          })
+          res.json(page);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          });
      }
 }
