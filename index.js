@@ -71,6 +71,7 @@ app.use('/uploads/partners', express.static('uploads/partners'));
 app.use('/uploads/documents', express.static('uploads/documents'));
 app.use('/uploads/contacts', express.static('uploads/contacts'));
 app.use('/uploads/editor', express.static('uploads/editor'));
+app.use('/uploads/mail', express.static('uploads/mail'));
 
 /* Admin registration/login */
 app.post('/register', checkAuthAdmin, adminRegisterValidator, AdminController.register);
@@ -124,8 +125,12 @@ app.get('/city/:link', CityController.getCityByLink);
 
 /* Mail */
 app.get('/mail/notanswered', MailController.getAllMailsWithoutAnswers);
+app.get('/mail/answered', MailController.getAllMailsWithAnswers);
+app.get('/mail/access', MailController.getAllMailsWithAccess);
 app.post('/mail', upload.array('files'), MailController.sendMailToChairmanBlog);
-
+app.post('/mail/answer/:id', checkAuthAdmin, MailController.answerToMail);
+app.post('/mail/show/:id', checkAuthAdmin, MailController.showMail);
+app.post('/mail/hide/:id', checkAuthAdmin, MailController.hideMail);
 
 const port = process.env.PORT || 4000;
 

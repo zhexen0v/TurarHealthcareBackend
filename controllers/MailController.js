@@ -1,12 +1,10 @@
 import Mail from "../models/Mail.js";
 import Mailgun from 'mailgun-js';
-import request from "request";
 import fs from 'fs';
-import path from 'path';
 
 const mailgun = Mailgun({
-     apiKey: '151cc9beef0236e04318248b2f62d0ba-d51642fa-1dd2342e',
-     domain: 'sandbox1b441c945d6749fa99b16da47b3f1f3f.mailgun.org',
+     apiKey: '557de4b7b24d3a0e34d8202010f994b5-d51642fa-8b67675c',
+     domain: 'sandbox3d5d9fe742884395a21c4833252b2848.mailgun.org',
 });
 
 export const sendMailToChairmanBlog = async (req, res) => {
@@ -42,23 +40,28 @@ export const sendMailToChairmanBlog = async (req, res) => {
                               res.status(500).send({ message: 'Error in sending email' });
                          } else {
                               console.log(body);
-                              console.log('Hello from sendMail!');
+
                               res.send({ message: 'Email sent successfully' });
                          }
                     }
           );
-          
-          /*
           const newDocument = new Mail({
                senderData: {
                     name: req.body.name.trim(),
                     surname: req.body.surname.trim(),
                     email: req.body.email.trim()
                },
-               message: req.body.message.trim()
+               message: req.body.message.trim(),
+               access: false
           });
+          if (req.files) {
+               const namesOfFiles = [];
+               req.files.forEach(file => {
+                    namesOfFiles.push(file.filename);
+               });
+               newDocument.files = namesOfFiles;
+          }
           await newDocument.save();
-          */
      } catch (err) {
           console.log(err);
           res.status(500).json({
@@ -72,6 +75,96 @@ export const getAllMailsWithoutAnswers = async (req, res) => {
           const mails = await Mail.find({answer: {$exists: false}});
           res.json(mails);
      } catch (err) {
+          console.log(err);
+          res.status(500).json({
+               message: err.message
+          });
+     }
+}
+
+export const getAllMailsWithAnswers = async (req, res) => {
+     try {
+          const mails = await Mail.find({answer: {$exists: true}});
+          res.json(mails);
+     } catch (err) {
+          console.log(err);
+          res.status(500).json({
+               message: err.message
+          });
+     }
+}
+
+export const getAllMailsWithAccess = async (req, res) => {
+     try {
+          const mails = await Mail.find({access: true});
+          res.json(mails);
+     } catch (err) {
+          console.log(err);
+          res.status(500).json({
+               message: err.message
+          });
+     }
+}
+
+export const answerToMail = async (req, res) => {
+     try {
+          const updatedMail = await Mail.findByIdAndUpdate(
+               req.params.id,
+               {
+                    $set: {answer: req.body.answer}
+               }
+          )
+          if (!updatedMail) {
+               res.status(404).json({
+                    message: 'Mail not found'
+               })
+          }
+          res.json(updatedMail);
+     } catch (err) {
+          console.log(err);
+          res.status(500).json({
+               message: err.message
+          });
+     }
+}
+
+export const showMail = async (req, res) => {
+     try {
+          const updatedMail = await Mail.findByIdAndUpdate(
+               req.params.id,
+               {
+                    access: true
+               }
+          )
+          if (!updatedMail) {
+               res.status(404).json({
+                    message: 'Mail not found'
+               })
+          }
+          res.json(updatedMail);
+     } catch (error) {
+          console.log(err);
+          res.status(500).json({
+               message: err.message
+          });
+     }
+}
+
+export const hideMail = async (req, res) => {
+     try {
+          const updatedMail = await Mail.findByIdAndUpdate(
+               req.params.id,
+               {
+                    access: false
+               }
+          )
+          if (!updatedMail) {
+               res.status(404).json({
+                    message: 'Mail not found'
+               })
+          }
+          res.json(updatedMail);
+     } catch (error) {
           console.log(err);
           res.status(500).json({
                message: err.message

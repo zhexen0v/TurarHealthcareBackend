@@ -24,10 +24,18 @@ const MailSchema = new mongoose.Schema({
           type: String,
           required: true
      },
+     files: {
+          type: [String],
+          required: false
+     },
      answer: {
           type: String,
           required: false
      },
+     access: {
+          type: Boolean,
+          required: true
+     }
 }, {
      timestamps: true
 });
