@@ -131,6 +131,7 @@ app.post('/mail', upload.array('files'), MailController.sendMailToChairmanBlog);
 app.post('/mail/answer/:id', checkAuthAdmin, MailController.answerToMail);
 app.post('/mail/show/:id', checkAuthAdmin, MailController.showMail);
 app.post('/mail/hide/:id', checkAuthAdmin, MailController.hideMail);
+app.post('/mail/delete/:id', checkAuthAdmin, MailController.deleteMail);
 
 const port = process.env.PORT || 4000;
 

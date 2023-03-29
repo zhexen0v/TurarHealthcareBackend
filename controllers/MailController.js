@@ -96,7 +96,7 @@ export const getAllMailsWithAnswers = async (req, res) => {
 
 export const getAllMailsWithAccess = async (req, res) => {
      try {
-          const mails = await Mail.find({access: true});
+          const mails = await Mail.find({access: true}).sort({createdAt: -1});
           res.json(mails);
      } catch (err) {
           console.log(err);
@@ -169,5 +169,19 @@ export const hideMail = async (req, res) => {
           res.status(500).json({
                message: err.message
           });
+     }
+}
+
+export const deleteMail = async (req, res) => {
+     try {
+          await Mail.findByIdAndDelete(req.params.id);
+          res.json({
+               message: 'Mail deleted'
+          })
+     } catch (err) {
+          console.log(err);
+          res.status(500).json({
+               message: err.message
+          })
      }
 }
