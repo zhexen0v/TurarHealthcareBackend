@@ -2,6 +2,7 @@ import City from "../models/City.js";
 import Blog from "../models/Blog.js";
 import { validationResult } from "express-validator";
 
+
 export const addNewCity = async (req, res) => {
      try {
           const errors = validationResult(req);

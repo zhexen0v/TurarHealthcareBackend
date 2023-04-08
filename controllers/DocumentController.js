@@ -1,5 +1,6 @@
 import Document from "../models/Document.js";
 import NestedPage from "../models/NestedPage.js";
+import PagePart from "../models/PagePart.js";
 import { deleteFileFromFolder } from "../utils/utils.js";
 /*
 export const addNewDocumentCategory = async (req, res) => {
@@ -225,6 +226,135 @@ export const deleteDocument = async (req, res) => {
 export const showDocumentsByPage = async (req, res) => {
      try {
           const documents = await Document.find({pageId: req.params.id});
+          if (!documents) {
+               res.status(400).json({
+                    message: 'Documents not found'
+               });
+          }
+          res.json(documents);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          })
+     }
+}
+
+export const addNewDocumentOfPagePart = async (req, res) => {
+     try {
+          const newDoc = new Document({
+               name: {
+                    kz: req.body.kzName.trim(),
+                    ru: req.body.ruName.trim(),
+                    en: req.body.enName.trim()
+               },
+               pagePartId: req.body.pagePartId,
+               filename: Buffer.from(req.file.originalname, 'latin1').toString('utf8') 
+          });
+          const newDocument = await newDoc.save();
+
+          const updatedNestedPage = await PagePart.findByIdAndUpdate(
+               req.body.pageId,
+               {
+                    $addToSet: {documents: newDocument._id}
+               }
+          );
+
+          if (!updatedNestedPage) {
+               res.status(400).json({
+                    message: 'Can not update category'
+               });
+          }
+
+          res.json(newDocument);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          });
+     }
+}
+
+export const updateDocumentOfPagePart = async (req, res) => {
+     try {
+          const beforeUpdate = await Document.findById(req.params.id);
+          let updatedObject = {
+               name: {
+                    kz: req.body.kzName.trim(),
+                    ru: req.body.ruName.trim(),
+                    en: req.body.enName.trim()
+               },
+               pagePartId: req.body.pagePartId
+          }
+
+          if (req.file) {
+               updatedObject.filename = Buffer.from(req.file.originalname, 'latin1').toString('utf8');
+          }
+
+          const updatedDocument = await Document.findByIdAndUpdate(
+               req.params.id,
+               updatedObject
+          );
+
+          if (!updatedDocument) {
+               res.status(404).json({
+                    message: 'Document not found'
+               });
+          }
+
+          deleteFileFromFolder('documents', beforeDelete.filename);
+
+          res.json(updatedDocument);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          });
+     }
+}
+
+export const deleteDocumentOfPagePart = async (req, res) => {
+     try {
+          const beforeDelete = await Document.findById(req.params.id);
+          try {
+               await Document.findByIdAndDelete(req.params.id);
+          } catch (error) {
+               console.log(error);
+               res.status(500).json({
+                    message: error.message
+               });
+          }
+          
+
+          const updatedCategory = await PagePart.findByIdAndUpdate(
+               beforeDelete.pagePartId,
+               {
+                    $pull: {documents: beforeDelete._id}
+               }
+          );
+
+          if (!updatedCategory) {
+               res.status(400).json({
+                    message: 'Category did not update'
+               });
+          }
+
+          deleteFileFromFolder('documents', beforeDelete.filename);
+
+          res.json({
+               message: 'Document successfully deleted'
+          });
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          })
+     }
+}
+
+export const showDocumentsByPagePart = async (req, res) => {
+     try {
+          const documents = await Document.find({pagePartId: req.params.id});
           if (!documents) {
                res.status(400).json({
                     message: 'Documents not found'

@@ -23,7 +23,12 @@ const DocumentSchema = new mongoose.Schema({
      pageId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'NestedPage',
-          required: true
+          required: false
+     },
+     pagePartId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'PagePart',
+          required: false
      },
      filename: {
           type: String,

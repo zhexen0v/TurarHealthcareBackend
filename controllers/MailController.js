@@ -1,10 +1,11 @@
 import Mail from "../models/Mail.js";
 import Mailgun from 'mailgun-js';
 import fs from 'fs';
+import 'dotenv/config';
 
 const mailgun = Mailgun({
-     apiKey: '557de4b7b24d3a0e34d8202010f994b5-d51642fa-8b67675c',
-     domain: 'sandbox3d5d9fe742884395a21c4833252b2848.mailgun.org',
+     apiKey: process.env.APIKEY,
+     domain: process.env.DOMAIN,
 });
 
 export const sendMailToChairmanBlog = async (req, res) => {

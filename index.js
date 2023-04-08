@@ -91,13 +91,11 @@ app.get('/blog/:id', BlogController.showArticleById);
 app.post('/blog/add', checkAuthAdmin, upload.single("blog"), BlogController.addNewArticleIntoBlog);
 app.post('/blog/update', checkAuthAdmin, upload.single("blog"), BlogController.updateArticleIntoBlog);
 app.post('/blog/delete/:id', checkAuthAdmin, BlogController.deleteArticle);
-
 /* Partner */
 app.post('/partner/add', checkAuthAdmin, upload.single('partner'), addOrUpdatePartner, PartnerController.addNewPartner);
 app.post('/partner/update', checkAuthAdmin, upload.single('partner'), addOrUpdatePartner, PartnerController.updatePartner);
 app.post('/partner/delete/:id', checkAuthAdmin, PartnerController.deletePartner);
 app.get('/partners', PartnerController.getAllPartners);
-
 /* Pages */
 app.get('/:link', PageController.showPageByLink);
 app.get('/nested/:id', PageController.showNestedPageById);
@@ -109,20 +107,25 @@ app.post('/page/nested/update', checkAuthAdmin, PageController.updateNestedPage)
 app.post('/page/nested/delete/:id', checkAuthAdmin, PageController.deleteNestedPage);
 app.post('/page/increment/:id', checkAuthAdmin, PageController.incrementOrderOfPage);
 app.post('/page/decrement/:id', checkAuthAdmin, PageController.decrementOrderOfPage);
-
+app.post('/page/part/add', checkAuthAdmin, PageController.addPartOfNestedPage);
+app.post('/page/part/update/', checkAuthAdmin, PageController.updatePagePart);
+app.post('/page/part/delete/:id', checkAuthAdmin, PageController.deletePagePart);
+app.get('/part/:link', PageController.showPagePartByLink);
 /* Documents */
 app.post('/document/add', checkAuthAdmin, upload.single('file'), DocumentController.addNewDocument);
 app.post('/document/update/:id', checkAuthAdmin, upload.single('file'), DocumentController.updateDocument);
 app.post('/document/delete/:id', checkAuthAdmin, DocumentController.deleteDocument);
 app.get('/documents/:id', DocumentController.showDocumentsByPage);
-
+app.post('/document/part/add', checkAuthAdmin, upload.single('file'), DocumentController.addNewDocumentOfPagePart);
+app.post('/document/part/update/:id', checkAuthAdmin, upload.single('file'), DocumentController.updateDocumentOfPagePart);
+app.post('/document/part/delete/:id', checkAuthAdmin, DocumentController.deleteDocumentOfPagePart);
+app.get('/documents/part/:id', DocumentController.showDocumentsByPagePart);
 /* Cities */
 app.post('/city/add', checkAuthAdmin, addOrUpdateCityValidator, CityController.addNewCity);
 app.post('/city/update/:id', checkAuthAdmin, addOrUpdateCityValidator, CityController.updateCity);
 app.post('/city/delete/:id', checkAuthAdmin, CityController.deleteCity);
 app.get('/city/all', CityController.getAllCities);
 app.get('/city/:link', CityController.getCityByLink);
-
 /* Mail */
 app.get('/mail/notanswered', MailController.getAllMailsWithoutAnswers);
 app.get('/mail/answered', MailController.getAllMailsWithAnswers);

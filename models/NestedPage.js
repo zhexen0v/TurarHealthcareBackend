@@ -46,6 +46,11 @@ const NestedPageSchema = new mongoose.Schema({
                return this.isListOfDocuments;
           }
      },
+     parts: {
+          type: [mongoose.Schema.Types.ObjectId],
+          ref: 'PagePart',
+          required: false
+     },
      orderNumber: {
           type: Number,
           required: false,
