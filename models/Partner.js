@@ -21,6 +21,11 @@ const PartnerSchema = new mongoose.Schema({
      imageUrl: {
           type: String,
           required: true,
+     },
+     orderNumber: {
+          type: Number,
+          required: true,
+          min: 1
      }
 },
 {

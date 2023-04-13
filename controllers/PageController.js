@@ -225,12 +225,13 @@ export const incrementOrderOfPage = async (req, res) => {
                }
           )
           const page = await NestedPage.findById(req.params.id);
-          await NestedPage.updateOne({$and: [
+          const v = await NestedPage.updateOne({$and: [
                {_id: {$ne: page._id}},
+               {parentPage: page.parentPage},
                {orderNumber: page.orderNumber}
           ]}, {
                $inc: {orderNumber: 1}
-          })
+          });
           res.json(page);
      } catch (error) {
           console.log(error);
@@ -368,6 +369,18 @@ export const showPagePartByLink = async (req, res) => {
                data: data,
                parent: parentPage
           });
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          });
+     }
+}
+
+export const showPagePartById = async (req, res) => {
+     try {
+          const data = await PagePart.findById(req.params.id);
+          res.json(data);
      } catch (error) {
           console.log(error);
           res.status(500).json({

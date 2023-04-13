@@ -87,12 +87,70 @@ export const updatePartner = async (req, res) => {
 
 export const deletePartner = async (req, res) => {
      try {
-          const deletedPartner = await Partner.findByIdAndDelete(req.params.id);
+          const deletedPartner = await Partner.findById(req.params.id);
+          const partners = await Partner.find({orderNumber: {$gt: deletedPartner.orderNumber}});
+          for (let i = 0; i < partners.length; i++) {
+               await Partner.findByIdAndUpdate(
+                    partners[i]._id,
+                    {
+                         $inc: {orderNumber: -1}
+                    }
+               )
+          }
+          await Partner.findByIdAndDelete(req.params.id);
           res.json(deletedPartner);
      } catch (error) {
           console.log(error);
           res.status(500).json({
                message: error.message
           })
+     }
+}
+
+export const incrementOrderOfPartner = async (req, res) => {
+     try {
+          await Partner.findByIdAndUpdate(
+               req.params.id,
+               {
+                    $inc: {orderNumber: -1} 
+               }
+          )
+          const partner = await Partner.findById(req.params.id);
+          await Partner.updateOne({$and: [
+               {_id: {$ne: partner._id}},
+               {orderNumber: partner.orderNumber}
+          ]}, {
+               $inc: {orderNumber: 1}
+          });
+          res.json(partner);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          });
+     }
+}
+
+export const decrementOrderOfPartner = async (req, res) => {
+     try {
+          await Partner.findByIdAndUpdate(
+               req.params.id,
+               {
+                    $inc: {orderNumber: 1} 
+               }
+          )
+          const partner = await Partner.findById(req.params.id);
+          await Partner.updateOne({$and: [
+               {_id: {$ne: partner._id}},
+               {orderNumber: partner.orderNumber}
+          ]}, {
+               $inc: {orderNumber: -1}
+          });
+          res.json(partner);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          });
      }
 }

@@ -95,6 +95,8 @@ app.post('/blog/delete/:id', checkAuthAdmin, BlogController.deleteArticle);
 app.post('/partner/add', checkAuthAdmin, upload.single('partner'), addOrUpdatePartner, PartnerController.addNewPartner);
 app.post('/partner/update', checkAuthAdmin, upload.single('partner'), addOrUpdatePartner, PartnerController.updatePartner);
 app.post('/partner/delete/:id', checkAuthAdmin, PartnerController.deletePartner);
+app.post('/partner/increment/:id', checkAuthAdmin, PartnerController.incrementOrderOfPartner);
+app.post('/partner/decrement/:id', checkAuthAdmin, PartnerController.decrementOrderOfPartner);
 app.get('/partners', PartnerController.getAllPartners);
 /* Pages */
 app.get('/:link', PageController.showPageByLink);
@@ -111,6 +113,7 @@ app.post('/page/part/add', checkAuthAdmin, PageController.addPartOfNestedPage);
 app.post('/page/part/update/', checkAuthAdmin, PageController.updatePagePart);
 app.post('/page/part/delete/:id', checkAuthAdmin, PageController.deletePagePart);
 app.get('/part/:link', PageController.showPagePartByLink);
+app.get('/part/id/:id', PageController.showPagePartById);
 /* Documents */
 app.post('/document/add', checkAuthAdmin, upload.single('file'), DocumentController.addNewDocument);
 app.post('/document/update/:id', checkAuthAdmin, upload.single('file'), DocumentController.updateDocument);

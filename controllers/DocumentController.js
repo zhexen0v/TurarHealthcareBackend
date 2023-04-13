@@ -1,3 +1,4 @@
+import { assign } from "nodemailer/lib/shared/index.js";
 import Document from "../models/Document.js";
 import NestedPage from "../models/NestedPage.js";
 import PagePart from "../models/PagePart.js";
@@ -159,6 +160,7 @@ export const updateDocument = async (req, res) => {
           }
 
           if (req.file) {
+               deleteFileFromFolder('documents', beforeUpdate.filename);
                updatedObject.filename = Buffer.from(req.file.originalname, 'latin1').toString('utf8');
           }
 
@@ -173,7 +175,6 @@ export const updateDocument = async (req, res) => {
                });
           }
 
-          deleteFileFromFolder('documents', beforeDelete.filename);
 
           res.json(updatedDocument);
      } catch (error) {
@@ -248,23 +249,17 @@ export const addNewDocumentOfPagePart = async (req, res) => {
                     ru: req.body.ruName.trim(),
                     en: req.body.enName.trim()
                },
-               pagePartId: req.body.pagePartId,
+               pagePartId: req.body.pageId,
                filename: Buffer.from(req.file.originalname, 'latin1').toString('utf8') 
           });
           const newDocument = await newDoc.save();
 
-          const updatedNestedPage = await PagePart.findByIdAndUpdate(
+          await PagePart.findByIdAndUpdate(
                req.body.pageId,
                {
                     $addToSet: {documents: newDocument._id}
                }
           );
-
-          if (!updatedNestedPage) {
-               res.status(400).json({
-                    message: 'Can not update category'
-               });
-          }
 
           res.json(newDocument);
      } catch (error) {
@@ -288,6 +283,7 @@ export const updateDocumentOfPagePart = async (req, res) => {
           }
 
           if (req.file) {
+               deleteFileFromFolder('documents', beforeUpdate.filename);
                updatedObject.filename = Buffer.from(req.file.originalname, 'latin1').toString('utf8');
           }
 
@@ -301,9 +297,7 @@ export const updateDocumentOfPagePart = async (req, res) => {
                     message: 'Document not found'
                });
           }
-
-          deleteFileFromFolder('documents', beforeDelete.filename);
-
+          
           res.json(updatedDocument);
      } catch (error) {
           console.log(error);
@@ -368,3 +362,4 @@ export const showDocumentsByPagePart = async (req, res) => {
           })
      }
 }
+
