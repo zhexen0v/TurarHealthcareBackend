@@ -30,6 +30,11 @@ const DocumentSchema = new mongoose.Schema({
           ref: 'PagePart',
           required: false
      },
+     parentPageId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'ParentPage',
+          required: false
+     },
      filename: {
           type: String,
           required: true

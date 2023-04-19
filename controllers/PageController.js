@@ -10,6 +10,13 @@ export const addNewParentPage = async (req, res) => {
                link: req.body.link.trim(),
                isNested: req.body.isNested
           });
+          if (String(req.body.isNested).toLowerCase() === 'true') {
+               if (String(req.body.isListOfDocuments).toLowerCase() === 'true') {
+                    newDocument.documents = [];
+               } else {
+                    newDocument.content = req.body.content;
+               }
+          }
           const newParentPage = await newDocument.save();
           res.json(newParentPage);
      } catch (error) {

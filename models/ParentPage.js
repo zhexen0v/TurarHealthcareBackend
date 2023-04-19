@@ -33,6 +33,19 @@ const ParentPageSchema = new mongoose.Schema({
           type: MultilingualSchema,
           required: false
      },
+     isListOfDocuments: {
+          type: Boolean,
+          required: false
+     },
+     content: {
+          type: MultilingualSchema,
+          required: false
+     },
+     documents: {
+          type: [mongoose.Schema.Types.ObjectId],
+          ref: 'Document',
+          required: false
+     },
      link: {
           type: String,
           required: true,

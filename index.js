@@ -123,6 +123,10 @@ app.post('/document/part/add', checkAuthAdmin, upload.single('file'), DocumentCo
 app.post('/document/part/update/:id', checkAuthAdmin, upload.single('file'), DocumentController.updateDocumentOfPagePart);
 app.post('/document/part/delete/:id', checkAuthAdmin, DocumentController.deleteDocumentOfPagePart);
 app.get('/documents/part/:id', DocumentController.showDocumentsByPagePart);
+app.post('/document/parent/add', checkAuthAdmin, upload.single('file'), DocumentController.addNewDocumentOfParentPage);
+app.post('/document/parent/update/:id', checkAuthAdmin, upload.single('file'), DocumentController.updateDocumentOfParentPage);
+app.post('/document/parent/delete/:id', checkAuthAdmin, DocumentController.deleteDocumentOfParentPage);
+app.get('/documents/parent/:id', DocumentController.showDocumentsByParentPage);
 /* Cities */
 app.post('/city/add', checkAuthAdmin, addOrUpdateCityValidator, CityController.addNewCity);
 app.post('/city/update/:id', checkAuthAdmin, addOrUpdateCityValidator, CityController.updateCity);

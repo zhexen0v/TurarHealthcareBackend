@@ -1,6 +1,7 @@
 import { assign } from "nodemailer/lib/shared/index.js";
 import Document from "../models/Document.js";
 import NestedPage from "../models/NestedPage.js";
+import ParentPage from "../models/ParentPage.js";
 import PagePart from "../models/PagePart.js";
 import { deleteFileFromFolder } from "../utils/utils.js";
 /*
@@ -363,3 +364,123 @@ export const showDocumentsByPagePart = async (req, res) => {
      }
 }
 
+export const addNewDocumentOfParentPage = async (req, res) => {
+     try {
+          const newDoc = new Document({
+               name: {
+                    kz: req.body.kzName.trim(),
+                    ru: req.body.ruName.trim(),
+                    en: req.body.enName.trim()
+               },
+               parentPageId: req.body.pageId,
+               filename: Buffer.from(req.file.originalname, 'latin1').toString('utf8') 
+          });
+          const newDocument = await newDoc.save();
+
+          await ParentPage.findByIdAndUpdate(
+               req.body.pageId,
+               {
+                    $addToSet: {documents: newDocument._id}
+               }
+          );
+
+          res.json(newDocument);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          });
+     }
+}
+
+export const updateDocumentOfParentPage = async (req, res) => {
+     try {
+          const beforeUpdate = await Document.findById(req.params.id);
+          let updatedObject = {
+               name: {
+                    kz: req.body.kzName.trim(),
+                    ru: req.body.ruName.trim(),
+                    en: req.body.enName.trim()
+               },
+               parentPageId: req.body.pageId
+          }
+
+          if (req.file) {
+               deleteFileFromFolder('documents', beforeUpdate.filename);
+               updatedObject.filename = Buffer.from(req.file.originalname, 'latin1').toString('utf8');
+          }
+
+          const updatedDocument = await Document.findByIdAndUpdate(
+               req.params.id,
+               updatedObject
+          );
+
+          if (!updatedDocument) {
+               res.status(404).json({
+                    message: 'Document not found'
+               });
+          }
+          
+          res.json(updatedDocument);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          });
+     }
+}
+
+export const deleteDocumentOfParentPage = async (req, res) => {
+     try {
+          const beforeDelete = await Document.findById(req.params.id);
+          try {
+               await Document.findByIdAndDelete(req.params.id);
+          } catch (error) {
+               console.log(error);
+               res.status(500).json({
+                    message: error.message
+               });
+          }
+          
+          const updatedCategory = await PagePart.findByIdAndUpdate(
+               beforeDelete.parentPageId,
+               {
+                    $pull: {documents: beforeDelete._id}
+               }
+          );
+
+          if (!updatedCategory) {
+               res.status(400).json({
+                    message: 'Category did not update'
+               });
+          }
+
+          deleteFileFromFolder('documents', beforeDelete.filename);
+
+          res.json({
+               message: 'Document successfully deleted'
+          });
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          })
+     }
+}
+
+export const showDocumentsByParentPage = async (req, res) => {
+     try {
+          const documents = await Document.find({parentPageId: req.params.id});
+          if (!documents) {
+               res.status(400).json({
+                    message: 'Documents not found'
+               });
+          }
+          res.json(documents);
+     } catch (error) {
+          console.log(error);
+          res.status(500).json({
+               message: error.message
+          })
+     }
+}
